@@ -1,34 +1,31 @@
 corr <- function(directory, threshold = 0) {
-        ## 'directory' is a character vector of length 1 indicating
-        ## the location of the CSV files
 
-        ## 'threshold' is a numeric vector of length 1 indicating the
-        ## number of completely observed observations (on all
-        ## variables) required to compute the correlation between
-        ## nitrate and sulfate; the default is 0
+    #initiate empty vector
 
-        ## Return a numeric vector of correlations
-        ## NOTE: Do not round the result!
+    results <- numeric()
+    #first, retrieve all the filenames, in case the instructor is being sneaky,
+    #and has more files in his specdata folder than I do...
 
-        #initiate vector
+    filenames <- list.files(directory, pattern="*.csv", full.names=TRUE)
 
-        results <- numeric()
-        #first, retrieve all the filenames, in case the instructor is being sneaky,
-        #and has more files in his specdata folder than I do...
+    #for loop, apply once for each element in the filenames vector
+    for(i in seq_along(filenames)) {
 
-        filenames <- list.files(directory, pattern="*.csv", full.names=TRUE)
+        #read the data from the csv file into a dataframe, ignoring any rows with an NA entry
+        tempframe <- na.omit(read.csv(filenames[i]))
 
-        #for loop
-        for(i in seq_along(filenames)) {
-            tempframe <- na.omit(read.csv(filenames[i]))
+        #provided the number of entries is above the threshold value, correlate the two values
+        #in the 2nd and 3rd columns and append the result to the results vector
+        if(nrow(tempframe) > threshold) {
+            results <- append(results, cor(tempframe[,2], tempframe[,3]))
+        }
+        else {
 
-            if(nrow(tempframe) > threshold) {
-                results <- append(results, cor(tempframe[,2], tempframe[,3]))
-            }
-            else {
-                next
-            }
+        #skip the file if the threshold is not reached
+            next
+        }
 
-                                       }
-       results 
+    }
+    #output the results vector so the function can return it.
+    results
 }
